@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, NavLink, Navigate, Route, Routes } from "react-router-dom";
 import AddPage from "./pages/AddPage";
 import DetailPage from "./pages/DetailPage";
+import EditPage from "./pages/EditPage";
 import ListPage from "./pages/ListPage";
 import LoginPage from "./pages/LoginPage";
 
@@ -22,6 +23,7 @@ function App() {
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/equipments" element={<ListPage />} />
                     <Route path="/equipments/add" element={<AddPage />} />
+                    <Route path="/edit/:id" element={<EditPage />} />
                     <Route path="/equipments/:id" element={<DetailPage />} />
                     <Route path="*" element={<h2>Page non trouvee</h2>} />
                 </Routes>

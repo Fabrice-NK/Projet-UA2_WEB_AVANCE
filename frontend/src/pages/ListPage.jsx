@@ -1,10 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { getEquipments as getAllItems } from "../services/api";
+import { deleteItem, getEquipments as getAllItems } from "../services/api";
 import { Link } from "react-router-dom";
 
 function ListPage() {
 
     const [items, setItems] = useState([]);
+
+    const handleDelete = async (id) => {
+        try {
+            await deleteItem(id);
+            setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     useEffect(() => {
         getAllItems()
@@ -26,6 +35,14 @@ function ListPage() {
                         <Link to={`/equipments/${item.id}`}>
                             Voir détail
                         </Link>
+                        {" "}
+                        <Link to={`/edit/${item.id}`}>
+                            Modifier
+                        </Link>
+                        {" "}
+                        <button type="button" onClick={() => handleDelete(item.id)}>
+                            Supprimer
+                        </button>
                     </div>
                 ))
             )}

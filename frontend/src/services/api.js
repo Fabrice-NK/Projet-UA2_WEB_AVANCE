@@ -84,6 +84,22 @@ export const createItem = async (item) => {
     return data;
 };
 
+export const updateItem = async (id, item) => {
+    const response = await fetch(`${BASE_URL}/equipment/${id}`, {
+        method: "PUT",
+        headers: authHeaders(),
+        body: JSON.stringify(item),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || `Erreur API: ${response.status}`);
+    }
+
+    return data;
+};
+
 export const deleteEquipment = async (id) => {
     const response = await fetch(`${BASE_URL}/equipment/${id}`, {
         method: "DELETE",
@@ -96,3 +112,5 @@ export const deleteEquipment = async (id) => {
 
     return response.json();
 };
+
+export const deleteItem = deleteEquipment;

@@ -38,7 +38,7 @@ export const getEquipments = async () => {
     return payload?.data?.equipments ?? [];
 };
 
-export const getEquipmentById = async (id) => {
+export const getItemById = async (id) => {
     const response = await fetch(`${BASE_URL}/equipment/${id}`, {
         headers: authHeaders(),
     });
@@ -50,6 +50,8 @@ export const getEquipmentById = async (id) => {
     const payload = await response.json();
     return payload?.data ?? null;
 };
+
+export const getEquipmentById = getItemById;
 
 export const addEquipment = async (formData) => {
     const response = await fetch(`${BASE_URL}/equipment`, {
@@ -64,6 +66,22 @@ export const addEquipment = async (formData) => {
     }
 
     return response.json();
+};
+
+export const createItem = async (item) => {
+    const response = await fetch(`${BASE_URL}/equipment`, {
+        method: "POST",
+        headers: authHeaders(),
+        body: JSON.stringify(item),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message || `Erreur API: ${response.status}`);
+    }
+
+    return data;
 };
 
 export const deleteEquipment = async (id) => {

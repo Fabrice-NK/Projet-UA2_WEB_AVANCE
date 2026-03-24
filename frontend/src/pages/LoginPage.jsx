@@ -1,18 +1,30 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { login } from "../store/authSlice";
 
 function LoginPage() {
-	const navigate = useNavigate();
+	const dispatch = useDispatch();
+	const [email, setEmail] = useState("");
+
+	const handleLogin = () => {
+		const fakeUser = { email };
+		dispatch(login(fakeUser));
+	};
 
 	return (
 		<div>
-			<h1>Page Login</h1>
-			<p>Connexion simulée.</p>
+			<h1>Login</h1>
 
-			<div style={{ display: "flex", gap: "12px" }}>
-				<button type="button" onClick={() => navigate("/equipments")}>Se connecter</button>
-				<Link to="/equipments/add">Aller a la page ajout</Link>
-			</div>
+			<input
+				placeholder="Email"
+				value={email}
+				onChange={(e) => setEmail(e.target.value)}
+			/>
+
+			<button type="button" onClick={handleLogin}>
+				Se connecter
+			</button>
 		</div>
 	);
 }

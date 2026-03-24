@@ -1,27 +1,34 @@
+import React, { useEffect, useState } from "react";
+import { getEquipments as getAllItems } from "../services/api";
 import { Link } from "react-router-dom";
 
-const equipments = [
-    { id: 1, name: "Microscope" },
-    { id: 2, name: "Centrifugeuse" },
-    { id: 3, name: "Balance" },
-];
-
 function ListPage() {
+
+    const [items, setItems] = useState([]);
+
+    useEffect(() => {
+        getAllItems()
+            .then(data => setItems(data))
+            .catch(err => console.error(err));
+    }, []);
+
     return (
         <div>
-            <h1>Page Liste</h1>
+            <h1>Liste</h1>
 
-            <p>
-                <Link to="/equipments/add">Ajouter un equipement</Link>
-            </p>
+            {items.length === 0 ? (
+                <p>Chargement...</p>
+            ) : (
+                items.map(item => (
+                    <div key={item.id}>
+                        <p>{item.nom}</p>
 
-            <ul>
-                {equipments.map((equipment) => (
-                    <li key={equipment.id}>
-                        {equipment.name} - <Link to={`/equipments/${equipment.id}`}>Voir detail</Link>
-                    </li>
-                ))}
-            </ul>
+                        <Link to={`/equipments/${item.id}`}>
+                            Voir détail
+                        </Link>
+                    </div>
+                ))
+            )}
         </div>
     );
 }

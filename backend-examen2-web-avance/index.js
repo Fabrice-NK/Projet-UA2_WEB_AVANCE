@@ -24,6 +24,28 @@ app.use(compression())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
+app.get('/', (_req, res) => {
+	res.status(200).json({
+		message: 'API backend en ligne',
+		basePath: '/api',
+	});
+})
+
+app.get('/api', (_req, res) => {
+	res.status(200).json({
+		message: 'Racine API disponible',
+		endpoints: [
+			'/api/login',
+			'/api/users',
+			'/api/departments',
+			'/api/roles',
+			'/api/laboratories',
+			'/api/equipment',
+			'/api/subjects'
+		]
+	});
+})
+
 // Les routes 
 // app.get('/api/users',userList)
 app.use('/api/users', route)

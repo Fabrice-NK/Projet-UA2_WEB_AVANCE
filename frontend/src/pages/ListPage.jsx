@@ -22,27 +22,29 @@ function ListPage() {
     }, []);
 
     return (
-        <div>
-            <h1>Liste</h1>
+        <div className="container mt-4">
+            <h1 className="mb-3">Liste</h1>
 
             {items.length === 0 ? (
                 <p>Chargement...</p>
             ) : (
-                items.map(item => (
-                    <div key={item.id}>
-                        <p>{item.nom}</p>
+                items.map((item) => (
+                    <div className="card mb-2 p-3" key={item.id}>
+                        <h5>{item.nom ?? item.name}</h5>
 
-                        <Link to={`/equipments/${item.id}`}>
-                            Voir détail
-                        </Link>
-                        {" "}
-                        <Link to={`/edit/${item.id}`}>
-                            Modifier
-                        </Link>
-                        {" "}
-                        <button type="button" onClick={() => handleDelete(item.id)}>
-                            Supprimer
-                        </button>
+                        <div className="d-flex gap-2">
+                            <Link className="btn btn-primary" to={`/equipments/${item.id}`}>
+                                Detail
+                            </Link>
+
+                            <Link className="btn btn-warning" to={`/edit/${item.id}`}>
+                                Modifier
+                            </Link>
+
+                            <button className="btn btn-danger" type="button" onClick={() => handleDelete(item.id)}>
+                                Supprimer
+                            </button>
+                        </div>
                     </div>
                 ))
             )}

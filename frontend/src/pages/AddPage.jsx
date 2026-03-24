@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { addEquipment } from "../services/api";
+import { validateAddPageForm } from "../helpers/validation";
 
 function AddPage() {
 	const navigate = useNavigate();
@@ -11,7 +12,7 @@ function AddPage() {
 		image: null,
 	});
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState("");
+	const [errors, setErrors] = useState({});
 	const [success, setSuccess] = useState("");
 
 	const handleChange = (e) => {
@@ -26,11 +27,12 @@ function AddPage() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setError("");
+		setErrors({});
 		setSuccess("");
 
-		if (!form.nom.trim()) {
-			setError("Le nom est obligatoire.");
+		const validationErrors = validateAddPageForm(form.nom, form.description, form.image);
+		if (Object.keys(validationErrors).length > 0) {
+			setErrors(validationErrors);
 			return;
 		}
 
@@ -48,64 +50,74 @@ function AddPage() {
 			setSuccess("Equipement ajoute avec succes.");
 			setTimeout(() => navigate("/equipments"), 700);
 		} catch (err) {
-			setError(err.message || "Impossible d'ajouter l'equipement.");
+			setErrors({ submit: err.message || "Impossible d'ajouter l'equipement." });
 		} finally {
 			setLoading(false);
 		}
 	};
 
 	return (
-		<div>
-			<h1>Ajouter un equipement</h1>
+		<div className="container mt-4">
+			<h1 className="mb-3">Ajouter un equipement</h1>
 
-			<form onSubmit={handleSubmit} style={{ display: "grid", gap: "10px", maxWidth: "460px" }}>
-				<label>
-					Nom
+			{success && <div className="alert alert-success">{success}</div>}
+			{errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
+
+			<form onSubmit={handleSubmit} className="mb-4" style={{ maxWidth: "500px" }}>
+				<div className="mb-3">
+					<label className="form-label">Nom *</label>
 					<input
 						type="text"
 						name="nom"
 						value={form.nom}
 						onChange={handleChange}
-						required
+						className={`form-control ${errors.nom ? "is-invalid" : ""}`}
+						placeholder="Entrez le nom"
 					/>
-				</label>
+					{errors.nom && <div className="invalid-feedback">{errors.nom}</div>}
+				</div>
 
-				<label>
-					Modele
-					<select name="modele" value={form.modele} onChange={handleChange}>
+				<div className="mb-3">
+					<label className="form-label">Modele</label>
+					<select name="modele" value={form.modele} onChange={handleChange} className="form-control">
 						<option value="nouveau">nouveau</option>
 						<option value="ancien">ancien</option>
 						<option value="refait">refait</option>
 					</select>
-				</label>
+				</div>
 
-				<label>
-					Description
+				<div className="mb-3">
+					<label className="form-label">Description</label>
 					<textarea
 						name="description"
 						value={form.description}
 						onChange={handleChange}
 						rows={4}
+						className={`form-control ${errors.description ? "is-invalid" : ""}`}
+						placeholder="Entrez la description"
 					/>
-				</label>
+					{errors.description && <div className="invalid-feedback">{errors.description}</div>}
+				</div>
 
-				<label>
-					Image (optionnel)
-					<input type="file" name="image" accept="image/*" onChange={handleChange} />
-				</label>
+				<div className="mb-3">
+					<label className="form-label">Image (optionnel)</label>
+					<input
+						type="file"
+						name="image"
+						accept="image/*"
+						onChange={handleChange}
+						className={`form-control ${errors.image ? "is-invalid" : ""}`}
+					/>
+					{errors.image && <div className="invalid-feedback">{errors.image}</div>}
+				</div>
 
-				<button type="submit" disabled={loading}>
+				<button type="submit" disabled={loading} className="btn btn-primary">
 					{loading ? "Envoi..." : "Ajouter"}
 				</button>
+				<Link to="/equipments" className="btn btn-secondary ms-2">
+					Annuler
+				</Link>
 			</form>
-
-			{error && <p style={{ color: "red" }}>Erreur: {error}</p>}
-			{success && <p style={{ color: "green" }}>{success}</p>}
-
-			<div style={{ display: "flex", gap: "12px" }}>
-				<button type="button" onClick={() => navigate("/equipments")}>Retour liste</button>
-				<Link to="/login">Aller au login</Link>
-			</div>
 		</div>
 	);
 }

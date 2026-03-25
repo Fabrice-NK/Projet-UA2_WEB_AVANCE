@@ -1,23 +1,38 @@
-// import React from "react";
-
-// function App() {
-//     return (
-//         <div style={{ padding: "16px" }}>
-//             <h1>Gestion Laboratoire - Test</h1>
-//             <p>La page charge bien!</p>
-//         </div>
-//     );
-// }
-
-// export default App;
-
-
-// Ce fichier est le composant principal de l'application React. Il importe les routes définies dans AppRoutes et les rend. AppRoutes contient toutes les routes de l'application, y compris les pages de connexion, de liste, d'ajout, de modification et de détail pour les laboratoires et les équipements. Le composant App est ensuite utilisé dans le point d'entrée de l'application (main.jsx) pour rendre l'ensemble de l'application dans le DOM.
 import React from "react";
 import AppRoutes from "./routes/AppRoutes";
 
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 32, fontFamily: "sans-serif" }}>
+          <h2 style={{ color: "red" }}>Erreur de rendu</h2>
+          <pre style={{ color: "red", whiteSpace: "pre-wrap" }}>
+            {this.state.error?.message}
+          </pre>
+          <pre style={{ fontSize: 12, whiteSpace: "pre-wrap" }}>
+            {this.state.error?.stack}
+          </pre>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function App() {
-  return <AppRoutes />;
+  return (
+    <ErrorBoundary>
+      <AppRoutes />
+    </ErrorBoundary>
+  );
 }
 
 export default App;

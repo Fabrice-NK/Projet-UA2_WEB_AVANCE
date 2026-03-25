@@ -1,7 +1,15 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
 import { createLaboratory } from "../../services/laboratoryService";
+
+const schema = yup.object({
+  nom: yup.string().required("Le nom est obligatoire").min(2, "Au moins 2 caractères"),
+  salle: yup.string().optional(),
+  information: yup.string().optional(),
+});
 
 export default function LaboratoryAddPage() {
   const navigate = useNavigate();
@@ -10,7 +18,7 @@ export default function LaboratoryAddPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({ resolver: yupResolver(schema) });
 
   const onSubmit = async (data) => {
     try {

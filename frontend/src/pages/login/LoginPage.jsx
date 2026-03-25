@@ -9,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 
 const schema = yup.object({
   email: yup.string().email("Email invalide").required("Email obligatoire"),
-  mot_de_passe: yup.string().required("Mot de passe obligatoire"),
 });
 
 export default function LoginPage() {
@@ -26,7 +25,8 @@ export default function LoginPage() {
   });
 
   useEffect(() => {
-    if (isAuthenticated) {
+    const token = localStorage.getItem("token");
+    if (isAuthenticated && token && token !== "undefined" && token !== "null") {
       navigate("/laboratories");
     }
   }, [isAuthenticated, navigate]);
@@ -45,14 +45,6 @@ export default function LoginPage() {
             <label>Email</label>
             <input type="email" {...register("email")} />
             {errors.email && <p className="error">{errors.email.message}</p>}
-          </div>
-
-          <div>
-            <label>Mot de passe</label>
-            <input type="password" {...register("mot_de_passe")} />
-            {errors.mot_de_passe && (
-              <p className="error">{errors.mot_de_passe.message}</p>
-            )}
           </div>
 
           {error && <p className="error">{error}</p>}

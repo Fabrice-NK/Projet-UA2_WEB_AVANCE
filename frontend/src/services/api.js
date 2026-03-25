@@ -14,21 +14,31 @@
 
 import axios from "axios";
 
-
-
-// Créer une instance d'axios avec une URL de base
 const api = axios.create({
   baseURL: "http://localhost:5000/api",
 });
 
+// Injecter le token JWT dans chaque requête
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
-
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });
+
+// Rediriger vers /login si le serveur répond 401
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401) {
+      localStorage.removeItem("token");
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;

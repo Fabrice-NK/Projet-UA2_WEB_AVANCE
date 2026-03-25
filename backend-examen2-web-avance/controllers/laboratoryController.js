@@ -1,6 +1,7 @@
 import { Op } from "sequelize";
 import paginate from "../helpers/paginate.js";
 import { Laboratory } from "../models/relation.js";
+import { validationResult } from "express-validator";
 
 //1-Liste des labs
 export const laboratoryList = async (req, res) => {
@@ -21,6 +22,10 @@ export const laboratoryList = async (req, res) => {
 
 export const addLaboratory = async (req, res) => {
     const infoLab = req.body
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() })
+    }
 
     //Construire le chemin de l'image ou du fichier
     const picture = req.file
@@ -42,6 +47,10 @@ export const addLaboratory = async (req, res) => {
 export const updateLaboratory = async (req, res) => {
     const { id } = req.params
     const infoLab = req.body
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() })
+    }
     const { image, ...infoSansImage } = infoLab
     try {
         const result = await Laboratory.update(infoSansImage, { where: { id } })

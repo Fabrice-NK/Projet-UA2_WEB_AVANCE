@@ -1,7 +1,12 @@
 import { Role, User } from "../models/relation.js";
+import { validationResult } from "express-validator";
 
 export const addRole = async (req, res) => {
     const role = req.body
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() })
+    }
     try {
         const result = await Role.create(role)
         res.status(201).json({ message: "Role cree", data: result })
@@ -10,6 +15,23 @@ export const addRole = async (req, res) => {
         res.status(200).json({ message: error.message })
     }
 
+}
+
+export const updateRole = async (req, res) => {
+    const { id } = req.params
+    const role = req.body
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() })
+    }
+
+    try {
+        const { id: ignoredId, ...data } = role
+        const result = await Role.update(data, { where: { id } })
+        res.status(200).json({ message: `Role ${id} mis a jour`, data: result })
+    } catch (error) {
+        res.status(400).json({ message: error.message })
+    }
 }
 
 export const roleList = async (req, res) => {

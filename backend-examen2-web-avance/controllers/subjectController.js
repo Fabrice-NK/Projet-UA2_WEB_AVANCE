@@ -4,6 +4,7 @@
 import { Subject, User } from '../models/relation.js'
 import paginate from '../helpers/paginate.js'
 import { Op } from 'sequelize'
+import { validationResult } from 'express-validator'
 
 //-1 Lecture de la liste des matieres
 export const subjectList = async (req, res) => {
@@ -28,6 +29,11 @@ export const subjectList = async (req, res) => {
 //-2 Ajout d'une nouvelle matiere
 
 export const addSubject = async (req, res) => {
+        const errors = validationResult(req)
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() })
+        }
+
     //Les informations de la personne a ajouter depuis le formulaire/Postman
 
     //Construire le chemin de l'image ou du fichier
@@ -52,6 +58,10 @@ export const addSubject = async (req, res) => {
 export const updateSubject = async (req, res) => {
     const { id } = req.params
     const infoSubject = req.body
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() })
+    }
 
     const { image, ...infoSansPhoto } = infoSubject
     try {

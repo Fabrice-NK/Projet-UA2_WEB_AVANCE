@@ -1,6 +1,7 @@
 import { Op } from "sequelize";
 import paginate from "../helpers/paginate.js";
 import { Equipment } from "../models/relation.js";
+import { validationResult } from "express-validator";
 
 //1-Liste des equipements
 export const equipmentList = async (req, res) => {
@@ -21,6 +22,10 @@ export const equipmentList = async (req, res) => {
 
 export const addEquipment = async (req, res) => {
     const infoEquipment = req.body
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() })
+    }
 
     //Construire le chemin de l'image ou du fichier
     const picture = req.file
@@ -42,6 +47,10 @@ export const addEquipment = async (req, res) => {
 export const updateEquipment = async (req, res) => {
     const { id } = req.params
     const infoEquipment = req.body
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() })
+    }
     const { image, ...infoSansImage } = infoEquipment
 
     try {

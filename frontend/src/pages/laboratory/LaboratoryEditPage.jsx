@@ -1,91 +1,99 @@
-// import { useEffect } from "react";
-// import { useForm } from "react-hook-form";
-// import { useNavigate, useParams } from "react-router-dom";
-// import {
-//   getLaboratoryById,
-//   updateLaboratory,
-// } from "../../services/laboratoryService";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+	getLaboratoryById,
+	updateLaboratory,
+} from "../../services/laboratoryService";
 
-// export default function LaboratoryEditPage() {
-//   const { id } = useParams();
-//   const navigate = useNavigate();
+const schema = yup.object({
+	nom: yup.string().required("Le nom est obligatoire").min(2, "Au moins 2 caractères"),
+	salle: yup.string().optional(),
+	information: yup.string().optional(),
+});
 
-//   const {
-//     register,
-//     handleSubmit,
-//     reset,
-//     formState: { errors },
-//   } = useForm();
+export default function LaboratoryEditPage() {
+	const { id } = useParams();
+	const navigate = useNavigate();
 
-//   useEffect(() => {
-//     const loadLaboratory = async () => {
-//       try {
-//         const data = await getLaboratoryById(id);
-//         const lab = data?.data || data;
+	const {
+		register,
+		handleSubmit,
+		reset,
+		formState: { errors },
+	} = useForm({ resolver: yupResolver(schema) });
 
-//         reset({
-//           nom: lab.nom || "",
-//           salle: lab.salle || "",
-//           information: lab.information || "",
-//         });
-//       } catch (error) {
-//         console.error("Erreur chargement labo :", error);
-//       }
-//     };
+	useEffect(() => {
+		const loadLaboratory = async () => {
+			try {
+				const data = await getLaboratoryById(id);
+				const lab = data?.data || data;
 
-//     loadLaboratory();
-//   }, [id, reset]);
+				reset({
+					nom: lab.nom || "",
+					salle: lab.salle || "",
+					information: lab.information || "",
+				});
+			} catch (error) {
+				console.error("Erreur chargement labo :", error);
+			}
+		};
 
-//   const onSubmit = async (data) => {
-//     try {
-//       const formData = new FormData();
-//       formData.append("nom", data.nom);
-//       formData.append("salle", data.salle || "");
-//       formData.append("information", data.information || "");
+		loadLaboratory();
+	}, [id, reset]);
 
-//       if (data.image?.[0]) {
-//         formData.append("image", data.image[0]);
-//       }
+	const onSubmit = async (data) => {
+		try {
+			const formData = new FormData();
+			formData.append("nom", data.nom);
+			formData.append("salle", data.salle || "");
+			formData.append("information", data.information || "");
 
-//       await updateLaboratory(id, formData);
-//       navigate(`/laboratories/${id}`);
-//     } catch (error) {
-//       console.error("Erreur modification laboratoire :", error);
-//     }
-//   };
+			if (data.image?.[0]) {
+				formData.append("image", data.image[0]);
+			}
 
-//   return (
-//     <div className="page">
-//       <div className="card">
-//         <h2>Modifier un laboratoire</h2>
+			await updateLaboratory(id, formData);
+			navigate(`/laboratories/${id}`);
+		} catch (error) {
+			console.error("Erreur modification laboratoire :", error);
+		}
+	};
 
-//         <form onSubmit={handleSubmit(onSubmit)} className="form">
-//           <div>
-//             <label>Nom</label>
-//             <input
-//               {...register("nom", { required: "Le nom est obligatoire" })}
-//             />
-//             {errors.nom && <p className="error">{errors.nom.message}</p>}
-//           </div>
+	return (
+		<div className="page">
+			<div className="card">
+				<h2>Modifier un laboratoire</h2>
 
-//           <div>
-//             <label>Salle</label>
-//             <input {...register("salle")} />
-//           </div>
+				<form onSubmit={handleSubmit(onSubmit)} className="form">
+					<div>
+						<label>Nom</label>
+						<input
+							{...register("nom", { required: "Le nom est obligatoire" })}
+						/>
+						{errors.nom && <p className="error">{errors.nom.message}</p>}
+					</div>
 
-//           <div>
-//             <label>Information</label>
-//             <textarea {...register("information")} rows="4" />
-//           </div>
+					<div>
+						<label>Salle</label>
+						<input {...register("salle")} />
+					</div>
 
-//           <div>
-//             <label>Nouvelle image</label>
-//             <input type="file" {...register("image")} />
-//           </div>
+					<div>
+						<label>Information</label>
+						<textarea {...register("information")} rows="4" />
+					</div>
 
-//           <button type="submit">Mettre à jour</button>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// }
+					<div>
+						<label>Nouvelle image</label>
+						<input type="file" {...register("image")} />
+					</div>
+
+					<button type="submit">Mettre à jour</button>
+				</form>
+			</div>
+		</div>
+	);
+}

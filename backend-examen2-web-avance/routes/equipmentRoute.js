@@ -4,17 +4,16 @@ import upload from "../helpers/fileLoader.js";
 import { addEquipment, deleteEquipment, detailsEquipment, equipmentList, updateEquipment, updateEquipmentImage } from "../controllers/equipmentController.js";
 import { verifierToken } from "../authentification/verifierToken.js";
 import autoriser from "../authentification/autorisation.js";
+import equipmentRules from "../validations/equipmentValidation.js";
 
 const route = Router()
 
-route.all("*", verifierToken)
+route
     .get('/', equipmentList)
     .get('/:id', detailsEquipment)
-
-    .all("*", autoriser(["prof"]))
-    
-    .put('/:id', updateEquipment)
-    .post('/', upload.single('image'), addEquipment)
+    .all("*", verifierToken)
+    .put('/:id', equipmentRules, updateEquipment)
+    .post('/', upload.single('image'), equipmentRules, addEquipment)
     .delete('/:id', deleteEquipment)
     .put('/:id/image', upload.single('image'), updateEquipmentImage)
 

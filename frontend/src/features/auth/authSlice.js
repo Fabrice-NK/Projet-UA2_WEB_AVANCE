@@ -10,6 +10,12 @@ export const loginUser = createAsyncThunk(
   async (credentials, thunkAPI) => {
     try {
       const response = await api.post("/login", credentials);
+      const token = response?.data?.token;
+
+      if (!token) {
+        return thunkAPI.rejectWithValue("Token de connexion manquant");
+      }
+
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
@@ -19,9 +25,19 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+const persistedToken = localStorage.getItem("token");
+const validToken =
+  persistedToken && persistedToken !== "undefined" && persistedToken !== "null"
+    ? persistedToken
+    : null;
+
+if (!validToken) {
+  localStorage.removeItem("token");
+}
+
 const initialState = {
-  token: localStorage.getItem("token") || null,
-  isAuthenticated: !!localStorage.getItem("token"),
+  token: validToken,
+  isAuthenticated: !!validToken,
   loading: false,
   error: null,
 };

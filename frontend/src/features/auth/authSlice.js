@@ -1,60 +1,77 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import api from "../../services/api";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import api from '../../services/api'
 
-
-
-// Ce fichier gère l'état d'authentification de l'utilisateur, en utilisant Redux Toolkit pour créer un slice avec des actions et des reducers. Il inclut une action asynchrone pour la connexion de l'utilisateur, qui communique avec l'API backend pour obtenir un token d'authentification.
-
-export const loginUser = createAsyncThunk(
-  "auth/loginUser",
-  async (credentials, thunkAPI) => {
-    try {
-      const response = await api.post("/login", credentials);
-      return response.data;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "Échec de connexion"
-      );
-    }
+// Login
+export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
+  try {
+    const res = await api.post('/login', credentials)
+    const { data: user, token } = res.data
+    // Fetch full user info with roles
+    const userRes = await api.get(`/users/${user.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    const fullUser = userRes.data.data
+    localStorage.setItem('token', token)
+    localStorage.setItem('user', JSON.stringify(fullUser))
+    return { user: fullUser, token }
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || 'Identifiants invalides')
   }
-);
+})
 
-const initialState = {
-  token: localStorage.getItem("token") || null,
-  isAuthenticated: !!localStorage.getItem("token"),
-  loading: false,
-  error: null,
-};
+const storedUser = localStorage.getItem('user')
+const storedToken = localStorage.getItem('token')
 
 const authSlice = createSlice({
-  name: "auth",
-  initialState,
+  name: 'auth',
+  initialState: {
+    user: storedUser ? JSON.parse(storedUser) : null,
+    token: storedToken || null,
+    isAuthenticated: !!storedToken,
+    loading: false,
+    error: null,
+  },
   reducers: {
-    logout: (state) => {
-      state.token = null;
-      state.isAuthenticated = false;
-      state.error = null;
-      localStorage.removeItem("token");
+    logout(state) {
+      state.user = null
+      state.token = null
+      state.isAuthenticated = false
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+    },
+    clearError(state) {
+      state.error = null
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(loginUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      .addCase(login.pending, (state) => {
+        state.loading = true
+        state.error = null
       })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.token = action.payload.token;
-        state.isAuthenticated = true;
-        localStorage.setItem("token", action.payload.token);
+      .addCase(login.fulfilled, (state, action) => {
+        state.loading = false
+        state.user = action.payload.user
+        state.token = action.payload.token
+        state.isAuthenticated = true
       })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || "Connexion impossible";
-      });
+      .addCase(login.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
   },
-});
+})
 
-export const { logout } = authSlice.actions;
-export default authSlice.reducer;
+export const { logout, clearError } = authSlice.actions
+
+// Selectors
+export const selectCurrentUser = (state) => state.auth.user
+export const selectIsAuthenticated = (state) => state.auth.isAuthenticated
+export const selectIsAdmin = (state) =>
+  state.auth.user?.Roles?.some((r) => r.titre?.toLowerCase() === 'admin') || false
+export const selectIsProf = (state) =>
+  state.auth.user?.Roles?.some(
+    (r) => r.titre?.toLowerCase() === 'prof' || r.titre?.toLowerCase() === 'admin'
+  ) || false
+
+export default authSlice.reducer

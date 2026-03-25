@@ -1,40 +1,38 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../services/api";
-
-
-
-// Ce fichier gère l'état d'authentification de l'utilisateur, en utilisant Redux Toolkit pour créer un slice avec des actions et des reducers. Il inclut une action asynchrone pour la connexion de l'utilisateur, qui communique avec l'API backend pour obtenir un token d'authentification.
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (credentials, thunkAPI) => {
     try {
       const response = await api.post("/login", credentials);
+
+      localStorage.setItem("token", response.data.token);
+
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || "Échec de connexion"
+        error.response?.data?.message || "Erreur de connexion"
       );
     }
   }
 );
 
-const initialState = {
-  token: localStorage.getItem("token") || null,
-  isAuthenticated: !!localStorage.getItem("token"),
-  loading: false,
-  error: null,
-};
-
 const authSlice = createSlice({
   name: "auth",
-  initialState,
+  initialState: {
+    user: null,
+    token: localStorage.getItem("token") || null,
+    loading: false,
+    error: null,
+    isAuthenticated: !!localStorage.getItem("token"),
+  },
   reducers: {
     logout: (state) => {
+      localStorage.removeItem("token");
+      state.user = null;
       state.token = null;
       state.isAuthenticated = false;
-      state.error = null;
-      localStorage.removeItem("token");
     },
   },
   extraReducers: (builder) => {
@@ -46,12 +44,13 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.token = action.payload.token;
+        state.user = action.payload.data;
         state.isAuthenticated = true;
-        localStorage.setItem("token", action.payload.token);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Connexion impossible";
+        state.error = action.payload;
+        state.isAuthenticated = false;
       });
   },
 });

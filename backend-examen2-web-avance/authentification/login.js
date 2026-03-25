@@ -42,7 +42,10 @@ export const login = async (req, res) => {
         if (!mdpCorrect) return res.status(401).json({ message: "Mot de passe incorrect" })
 
         //Creation de la clef d'acces
-        const payload = { id: user.id }
+            const payload = {
+            id: user.id,
+            role: user.role
+            }
         const token = jwt.sign(payload, process.env.CODE_SECRET)
 
         res.status(200).json({ data: user, token })

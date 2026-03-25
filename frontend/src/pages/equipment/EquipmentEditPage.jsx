@@ -3,11 +3,11 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  getLaboratoryById,
-  updateLaboratory,
-} from "../../services/laboratoryService";
+  getEquipmentById,
+  updateEquipment,
+} from "../../services/equipmentService";
 
-export default function LaboratoryEditPage() {
+export default function EquipmentEditPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -19,46 +19,46 @@ export default function LaboratoryEditPage() {
   } = useForm();
 
   useEffect(() => {
-    const loadLaboratory = async () => {
+    const loadEquipment = async () => {
       try {
-        const data = await getLaboratoryById(id);
-        const lab = data?.data || data;
+        const data = await getEquipmentById(id);
+        const item = data?.data || data;
 
         reset({
-          nom: lab.nom || "",
-          salle: lab.salle || "",
-          information: lab.information || "",
+          nom: item.nom || "",
+          modele: item.modele || "",
+          description: item.description || "",
         });
       } catch (error) {
-        console.error("Erreur chargement labo :", error);
+        console.error("Erreur chargement équipement :", error);
       }
     };
 
-    loadLaboratory();
+    loadEquipment();
   }, [id, reset]);
 
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
       formData.append("nom", data.nom);
-      formData.append("salle", data.salle || "");
-      formData.append("information", data.information || "");
+      formData.append("modele", data.modele);
+      formData.append("description", data.description || "");
 
       if (data.image?.[0]) {
         formData.append("image", data.image[0]);
       }
 
-      await updateLaboratory(id, formData);
-      navigate(`/laboratories/${id}`);
+      await updateEquipment(id, formData);
+      navigate(`/equipment/${id}`);
     } catch (error) {
-      console.error("Erreur modification laboratoire :", error);
+      console.error("Erreur modification équipement :", error);
     }
   };
 
   return (
     <div className="page">
       <div className="card">
-        <h2>Modifier un laboratoire</h2>
+        <h2>Modifier un équipement</h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="form">
           <div>
@@ -70,13 +70,21 @@ export default function LaboratoryEditPage() {
           </div>
 
           <div>
-            <label>Salle</label>
-            <input {...register("salle")} />
+            <label>Modèle</label>
+            <select
+              {...register("modele", { required: "Le modèle est obligatoire" })}
+            >
+              <option value="">Choisir</option>
+              <option value="nouveau">nouveau</option>
+              <option value="ancien">ancien</option>
+              <option value="refait">refait</option>
+            </select>
+            {errors.modele && <p className="error">{errors.modele.message}</p>}
           </div>
 
           <div>
-            <label>Information</label>
-            <textarea {...register("information")} rows="4" />
+            <label>Description</label>
+            <textarea {...register("description")} rows="4" />
           </div>
 
           <div>

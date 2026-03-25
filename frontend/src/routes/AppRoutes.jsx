@@ -3,12 +3,12 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "../pages/login/LoginPage";
 import LaboratoryListPage from "../pages/laboratory/LaboratoryListPage";
 import LaboratoryAddPage from "../pages/laboratory/LaboratoryAddPage";
-// import LaboratoryEditPage from "../pages/laboratory/LaboratoryEditPage";
-// import LaboratoryDetailPage from "../pages/laboratory/LaboratoryDetailPage";
-// import EquipmentListPage from "../pages/equipment/EquipmentListPage";
-// import EquipmentAddPage from "../pages/equipment/EquipmentAddPage";
-// import EquipmentEditPage from "../pages/equipment/EquipmentEditPage";
-// import EquipmentDetailPage from "../pages/equipment/EquipmentDetailPage";
+import LaboratoryEditPage from "../pages/laboratory/LaboratoryEditPage";
+import LaboratoryDetailPage from "../pages/laboratory/LaboratoryDetailPage";
+import EquipmentListPage from "../pages/equipment/EquipmentListPage";
+import EquipmentAddPage from "../pages/equipment/EquipmentAddPage";
+import EquipmentEditPage from "../pages/equipment/EquipmentEditPage";
+import EquipmentDetailPage from "../pages/equipment/EquipmentDetailPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 import Layout from "../components/Layout";
 
@@ -32,13 +32,13 @@ export default function AppRoutes() {
 
         <Route path="laboratories" element={<LaboratoryListPage />} />
         <Route path="laboratories/add" element={<LaboratoryAddPage />} />
-        {/* <Route path="laboratories/:id" element={<LaboratoryDetailPage />} />
-        <Route path="laboratories/:id/edit" element={<LaboratoryEditPage />} /> */}
+        <Route path="laboratories/:id" element={<LaboratoryDetailPage />} />
+        <Route path="laboratories/:id/edit" element={<LaboratoryEditPage />} />
 
-        {/* <Route path="equipment" element={<EquipmentListPage />} />
+        <Route path="equipment" element={<EquipmentListPage />} />
         <Route path="equipment/add" element={<EquipmentAddPage />} />
         <Route path="equipment/:id" element={<EquipmentDetailPage />} />
-        <Route path="equipment/:id/edit" element={<EquipmentEditPage />} /> */}
+        <Route path="equipment/:id/edit" element={<EquipmentEditPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

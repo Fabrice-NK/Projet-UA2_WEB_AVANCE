@@ -15,7 +15,11 @@ route.all("*", verifierToken)
     .get('/:id/equipment', laboratoryEquipments)
     .get('/:id/subjects', laboratorySubjects)
 
+    //.all("*")
+
     .all("*", autoriser(["prof", "admin"]))
+
+
     .post('/', upload.single('image'), addLaboratory)
     .delete('/:id', deleteLaboratory)
     .put('/:id', updateLaboratory)

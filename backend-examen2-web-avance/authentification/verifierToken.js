@@ -12,6 +12,7 @@ export const verifierToken = (req, res, next) => {
     const token = bearerToken.split(' ')[1]
 
     jwt.verify(token, process.env.CODE_SECRET, (err, payload) => {
+        
         if (err) return res.status(401).json({ message: err.message })
 
         req.userId = payload.id

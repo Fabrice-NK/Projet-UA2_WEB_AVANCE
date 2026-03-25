@@ -1,34 +1,31 @@
-// const BASE_URL = "http://localhost:5000/api";
+import axios from 'axios'
 
-// export const getData = async () => {
-//     const response = await fetch(`${BASE_URL}/users`);
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
-//     if (!response.ok) {
-//         throw new Error(`Erreur API: ${response.status}`);
-//     }
-
-//     const payload = await response.json();
-//     return payload?.data?.users ?? [];
-// };
-
-
-import axios from "axios";
-
-
-
-// Créer une instance d'axios avec une URL de base
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
-});
+  baseURL: `${BASE_URL}/api`,
+})
 
+// Attach JWT token to every request
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-
+  const token = localStorage.getItem('token')
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token}`
   }
+  return config
+})
 
-  return config;
-});
+// Handle 401 globally
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
 
-export default api;
+export default api
